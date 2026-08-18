@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARJUN AI</title>
+</head>
+<body>
+  <h1>🤖 ARJUN AI</h1>
+  <p>My JARVIS-style Assistant</p>
+
+  <button onclick="speak()">Talk to ARJUN AI</button>
+
+  <script>
+    function speak() {
+      const message = new SpeechSynthesisUtterance(
+        "Hello Arjun. I am your AI assistant. How can I help you?"
+      );
+      speechSynthesis.speak(message);
+    }
+  </script>
+</body>
+</html>
