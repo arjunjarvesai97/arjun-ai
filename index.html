@@ -3,222 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JARVEES AI</title>
-
+  <title>Arjun AI - My Personal AI Assistant</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #050505;
+      background: #111827;
       color: white;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .jarvees {
-      width: 100%;
-      max-width: 500px;
-      height: 100vh;
-      max-height: 850px;
-      background: #0d0d0d;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header {
-      padding: 20px;
       text-align: center;
-      border-bottom: 1px solid #222;
     }
 
-    .header h1 {
-      font-size: 28px;
-      letter-spacing: 4px;
+    .box {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 30px;
     }
 
-    .header p {
-      color: #888;
-      margin-top: 5px;
+    h1 {
+      font-size: 32px;
     }
 
-    .chat {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .message {
-      padding: 12px 15px;
-      margin-bottom: 12px;
-      border-radius: 15px;
-      max-width: 85%;
-      line-height: 1.5;
-    }
-
-    .ai {
-      background: #191919;
-      margin-right: auto;
-    }
-
-    .user {
-      background: #333;
-      margin-left: auto;
-    }
-
-    .input-area {
-      display: flex;
-      gap: 8px;
-      padding: 15px;
-      border-top: 1px solid #222;
+    p {
+      color: #cbd5e1;
     }
 
     input {
-      flex: 1;
+      width: 90%;
       padding: 14px;
-      border-radius: 25px;
-      border: 1px solid #333;
-      background: #181818;
-      color: white;
-      outline: none;
+      border-radius: 10px;
+      border: none;
+      margin-top: 20px;
+      font-size: 16px;
     }
 
     button {
+      margin-top: 15px;
+      padding: 13px 25px;
       border: none;
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      background: #ffffff;
-      color: #000;
-      font-size: 20px;
-      cursor: pointer;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
     }
 
-    button:hover {
-      transform: scale(1.05);
+    #answer {
+      margin-top: 25px;
+      color: #93c5fd;
     }
   </style>
 </head>
 
 <body>
+  <div class="box">
+    <h1>🤖 Arjun AI</h1>
+    <p>My Personal AI Assistant</p>
 
-  <div class="jarvees">
+    <input id="question" type="text" placeholder="Ask Arjun AI something...">
 
-    <div class="header">
-      <h1>JARVEES</h1>
-      <p>Your Personal AI Assistant</p>
-    </div>
+    <br>
+    <button onclick="askAI()">Ask Arjun AI</button>
 
-    <div class="chat" id="chat">
-      <div class="message ai">
-        नमस्कार अर्जुन 👋<br>
-        मी JARVEES आहे. तुमचा Personal AI Assistant.
-      </div>
-    </div>
-
-    <div class="input-area">
-      <input
-        type="text"
-        id="message"
-        placeholder="Ask JARVEES..."
-        onkeydown="if(event.key==='Enter') sendMessage()"
-      >
-
-      <button onclick="startVoice()">🎤</button>
-      <button onclick="sendMessage()">➤</button>
-    </div>
-
+    <div id="answer"></div>
   </div>
 
-<script>
+  <script>
+    function askAI() {
+      const question = document.getElementById("question").value;
+      const answer = document.getElementById("answer");
 
-function sendMessage() {
+      if (question.trim() === "") {
+        answer.innerText = "Please ask me something.";
+        return;
+      }
 
-  const input = document.getElementById("message");
-  const text = input.value.trim();
-
-  if (!text) return;
-
-  addMessage(text, "user");
-
-  input.value = "";
-
-  setTimeout(() => {
-
-    let reply = "मी JARVEES आहे. तुमचा प्रश्न समजला. माझा पूर्ण AI system आपण पुढच्या स्टेपमध्ये जोडणार आहोत.";
-
-    addMessage(reply, "ai");
-
-    speak(reply);
-
-  }, 500);
-}
-
-
-function addMessage(text, type) {
-
-  const chat = document.getElementById("chat");
-
-  const message = document.createElement("div");
-
-  message.className = "message " + type;
-
-  message.innerText = text;
-
-  chat.appendChild(message);
-
-  chat.scrollTop = chat.scrollHeight;
-}
-
-
-function speak(text) {
-
-  if ("speechSynthesis" in window) {
-
-    const speech = new SpeechSynthesisUtterance(text);
-
-    speech.lang = "mr-IN";
-
-    speechSynthesis.speak(speech);
-  }
-}
-
-
-function startVoice() {
-
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-
-    alert("Voice recognition तुमच्या browser मध्ये उपलब्ध नाही.");
-
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-
-  recognition.lang = "mr-IN";
-
-  recognition.start();
-
-  recognition.onresult = function(event) {
-
-    const text = event.results[0][0].transcript;
-
-    document.getElementById("message").value = text;
-
-  };
-}
-
-</script>
-
+      answer.innerText =
+        "Hello Arjun! I received your question: " + question;
+    }
+  </script>
 </body>
 </html>
