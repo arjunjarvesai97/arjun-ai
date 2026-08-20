@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arjun AI - My Personal AI Assistant</title>
+
   <style>
     body {
       margin: 0;
@@ -15,7 +16,7 @@
 
     .box {
       max-width: 500px;
-      margin: 80px auto;
+      margin: 50px auto;
       padding: 30px;
     }
 
@@ -32,8 +33,9 @@
       padding: 14px;
       border-radius: 10px;
       border: none;
-      margin-top: 20px;
+      margin-top: 12px;
       font-size: 16px;
+      box-sizing: border-box;
     }
 
     button {
@@ -44,41 +46,185 @@
       background: #2563eb;
       color: white;
       font-size: 16px;
+      cursor: pointer;
+    }
+
+    #loginBox {
+      margin-bottom: 30px;
+    }
+
+    #aiBox {
+      display: none;
     }
 
     #answer {
       margin-top: 25px;
       color: #93c5fd;
     }
+
+    #message {
+      margin-top: 15px;
+      color: #fbbf24;
+    }
   </style>
 </head>
 
 <body>
+
   <div class="box">
+
     <h1>🤖 Arjun AI</h1>
     <p>My Personal AI Assistant</p>
 
-    <input id="question" type="text" placeholder="Ask Arjun AI something...">
+    <!-- LOGIN -->
+    <div id="loginBox">
 
-    <br>
-    <button onclick="askAI()">Ask Arjun AI</button>
+      <h2>Login / Sign Up</h2>
 
-    <div id="answer"></div>
+      <input id="email" type="email" placeholder="Enter your email">
+
+      <input id="password" type="password" placeholder="Enter password">
+
+      <br>
+
+      <button onclick="signUp()">Sign Up</button>
+      <button onclick="login()">Login</button>
+
+      <div id="message"></div>
+
+    </div>
+
+    <!-- AI -->
+    <div id="aiBox">
+
+      <p>Welcome to Arjun AI! 🎉</p>
+
+      <input id="question" type="text"
+        placeholder="Ask Arjun AI something...">
+
+      <br>
+
+      <button onclick="askAI()">Ask Arjun AI</button>
+      <button onclick="logout()">Logout</button>
+
+      <div id="answer"></div>
+
+    </div>
+
   </div>
 
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";pzvqybgfndwgvmznizvj
+
+    const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
+
+    const supabaseClient =
+      supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+    async function signUp() {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const { error } =
+        await supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+      if (error) {
+        document.getElementById("message").innerText =
+          error.message;
+      } else {
+        document.getElementById("message").innerText =
+          "Account created! Check your email.";
+      }
+    }
+
+
+    async function login() {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const { error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if (error) {
+        document.getElementById("message").innerText =
+          error.message;
+      } else {
+        showAI();
+      }
+    }
+
+
+    async function logout() {
+
+      await supabaseClient.auth.signOut();
+
+      document.getElementById("loginBox").style.display = "block";
+      document.getElementById("aiBox").style.display = "none";
+    }
+
+
+    function showAI() {
+
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("aiBox").style.display = "block";
+    }
+
+
+    async function checkUser() {
+
+      const { data } =
+        await supabaseClient.auth.getSession();
+
+      if (data.session) {
+        showAI();
+      }
+    }
+
+
     function askAI() {
-      const question = document.getElementById("question").value;
-      const answer = document.getElementById("answer");
+
+      const question =
+        document.getElementById("question").value;
+
+      const answer =
+        document.getElementById("answer");
 
       if (question.trim() === "") {
-        answer.innerText = "Please ask me something.";
+
+        answer.innerText =
+          "Please ask me something.";
+
         return;
       }
 
       answer.innerText =
-        "Hello Arjun! I received your question: " + question;
+        "Hello Arjun! I received your question: " +
+        question;
     }
+
+
+    checkUser();
+
   </script>
+
 </body>
 </html>
