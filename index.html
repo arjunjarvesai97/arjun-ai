@@ -1,27 +1,15 @@
-<button onclick="testLogin()">TEST</button><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Arjun AI - My Personal AI Assistant</title>
 
-
   <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      min-height: 100vh;
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
@@ -29,15 +17,13 @@
     }
 
     .box {
-      width: 100%;
       max-width: 500px;
-      margin: 0 auto;
-      padding: 50px 20px;
+      margin: 50px auto;
+      padding: 30px 20px;
     }
 
     h1 {
       font-size: 32px;
-      margin-bottom: 5px;
     }
 
     p {
@@ -51,7 +37,7 @@
       border: none;
       border-radius: 10px;
       font-size: 16px;
-      outline: none;
+      box-sizing: border-box;
     }
 
     button {
@@ -65,14 +51,10 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #1d4ed8;
-    }
-
     #message {
       margin-top: 18px;
       color: #fbbf24;
-      min-height: 24px;
+      min-height: 25px;
     }
 
     #aiBox {
@@ -82,25 +64,16 @@
     #answer {
       margin-top: 25px;
       color: #93c5fd;
-      line-height: 1.5;
     }
-
   </style>
-
 </head>
 
-
 <body>
-
 
   <div class="box">
 
     <h1>🤖 Arjun AI</h1>
-
-    <p>
-      My Personal AI Assistant
-    </p>
-
+    <p>My Personal AI Assistant</p>
 
     <!-- LOGIN -->
 
@@ -108,41 +81,27 @@
 
       <h2>Login / Sign Up</h2>
 
-
       <input
         id="email"
         type="email"
         placeholder="Enter your email"
-        autocomplete="email"
       >
-
 
       <input
         id="password"
         type="password"
         placeholder="Enter password"
-        autocomplete="current-password"
       >
-
 
       <br>
 
-
-      <button
-        type="button"
-        onclick="signUp()"
-      >
+      <button type="button" id="signupBtn">
         Sign Up
       </button>
 
-
-      <button
-        type="button"
-        onclick="login()"
-      >
+      <button type="button" id="loginBtn">
         Login
       </button>
-
 
       <div id="message"></div>
 
@@ -153,10 +112,7 @@
 
     <div id="aiBox">
 
-      <h2>
-        Welcome to Arjun AI! 🎉
-      </h2>
-
+      <h2>Welcome to Arjun AI! 🎉</h2>
 
       <input
         id="question"
@@ -164,25 +120,15 @@
         placeholder="Ask Arjun AI something..."
       >
 
-
       <br>
 
-
-      <button
-        type="button"
-        onclick="askAI()"
-      >
+      <button type="button" id="askBtn">
         Ask Arjun AI
       </button>
 
-
-      <button
-        type="button"
-        onclick="logout()"
-      >
+      <button type="button" id="logoutBtn">
         Logout
       </button>
-
 
       <div id="answer"></div>
 
@@ -191,236 +137,173 @@
   </div>
 
 
-  <!-- SUPABASE -->
+  <!-- SUPABASE LIBRARY -->
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
-  <script>function testLogin() {
-  document.getElementById("message").innerText =
-    "JavaScript is working!";
-}
+  <script>
 
-    /*
-    =========================================
-    SUPABASE CONFIGURATION
-    =========================================
-    */
+    /* =========================
+       SUPABASE CONFIG
+       ========================= */
 
     const SUPABASE_URL =
       "https://pzvqybgfndwgvmznizvj.supabase.co";
 
-
     const SUPABASE_KEY =
-    ;sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
+     sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V 
 
 
-    /*
-    =========================================
-    CREATE SUPABASE CLIENT
-    =========================================
-    */
+    /* =========================
+       CREATE SUPABASE CLIENT
+       ========================= */
 
-    const arjunSupabase =
+    const client =
       window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
       );
 
 
-    /*
-    =========================================
-    MESSAGE
-    =========================================
-    */
+    /* =========================
+       ELEMENTS
+       ========================= */
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const message =
+      document.getElementById("message");
+
+    const loginBox =
+      document.getElementById("loginBox");
+
+    const aiBox =
+      document.getElementById("aiBox");
+
+    const questionInput =
+      document.getElementById("question");
+
+    const answer =
+      document.getElementById("answer");
+
+
+    /* =========================
+       MESSAGE
+       ========================= */
 
     function showMessage(text) {
-
-      document.getElementById(
-        "message"
-      ).innerText = text;
-
+      message.innerText = text;
     }
 
 
-    /*
-    =========================================
-    SIGN UP
-    =========================================
-    */
+    /* =========================
+       SIGN UP
+       ========================= */
 
     async function signUp() {
 
       const email =
-        document.getElementById(
-          "email"
-        ).value.trim();
-
+        emailInput.value.trim();
 
       const password =
-        document.getElementById(
-          "password"
-        ).value;
+        passwordInput.value;
 
 
-      if (!email) {
-
+      if (!email || !password) {
         showMessage(
-          "Please enter your email."
+          "Please enter email and password."
         );
-
-        return;
-      }
-
-
-      if (!password) {
-
-        showMessage(
-          "Please enter your password."
-        );
-
         return;
       }
 
 
       if (password.length < 6) {
-
         showMessage(
           "Password must be at least 6 characters."
         );
-
         return;
       }
 
 
-      showMessage(
-        "Creating account..."
-      );
+      showMessage("Creating account...");
 
 
       try {
 
-        const {
-          data,
-          error
-        } =
-          await arjunSupabase.auth.signUp({
-
+        const { data, error } =
+          await client.auth.signUp({
             email: email,
-
             password: password
-
           });
 
 
         if (error) {
-
           showMessage(
             "Sign Up Error: " +
             error.message
           );
-
           return;
         }
 
 
-        /*
-        If email confirmation is enabled,
-        Supabase will send confirmation email.
-        */
+        if (data.session) {
 
-        if (
-          data &&
-          data.user &&
-          !data.session
-        ) {
+          showAI();
+
+        } else {
 
           showMessage(
-            "Account created! Please confirm your email."
+            "Account created. Please confirm your email."
           );
 
-          return;
         }
-
-
-        showMessage(
-          "Account created successfully!"
-        );
-
 
       } catch (error) {
 
         showMessage(
-          "Connection Error: " +
-          error.message
+          "Error: " + error.message
         );
 
       }
-
     }
 
 
-    /*
-    =========================================
-    LOGIN
-    =========================================
-    */
+    /* =========================
+       LOGIN
+       ========================= */
 
     async function login() {
 
       const email =
-        document.getElementById(
-          "email"
-        ).value.trim();
-
+        emailInput.value.trim();
 
       const password =
-        document.getElementById(
-          "password"
-        ).value;
+        passwordInput.value;
 
 
-      if (!email) {
-
+      if (!email || !password) {
         showMessage(
-          "Please enter your email."
+          "Please enter email and password."
         );
-
         return;
       }
 
 
-      if (!password) {
-
-        showMessage(
-          "Please enter your password."
-        );
-
-        return;
-      }
-
-
-      showMessage(
-        "Logging in..."
-      );
+      showMessage("Logging in...");
 
 
       try {
 
-        const {
-          data,
-          error
-        } =
-          await arjunSupabase.auth
-            .signInWithPassword({
-
-              email: email,
-
-              password: password
-
-            });
+        const { data, error } =
+          await client.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
 
 
         if (error) {
@@ -434,10 +317,7 @@
         }
 
 
-        if (
-          data &&
-          data.session
-        ) {
+        if (data && data.session) {
 
           showMessage("");
 
@@ -446,11 +326,10 @@
         } else {
 
           showMessage(
-            "Login failed. No session found."
+            "Login failed."
           );
 
         }
-
 
       } catch (error) {
 
@@ -460,105 +339,62 @@
         );
 
       }
-
     }
 
 
-    /*
-    =========================================
-    SHOW AI
-    =========================================
-    */
+    /* =========================
+       SHOW AI
+       ========================= */
 
     function showAI() {
 
-      document.getElementById(
-        "loginBox"
-      ).style.display = "none";
+      loginBox.style.display =
+        "none";
 
-
-      document.getElementById(
-        "aiBox"
-      ).style.display = "block";
-
+      aiBox.style.display =
+        "block";
     }
 
 
-    /*
-    =========================================
-    LOGOUT
-    =========================================
-    */
+    /* =========================
+       LOGOUT
+       ========================= */
 
     async function logout() {
 
       try {
-
-        await arjunSupabase.auth.signOut();
-
+        await client.auth.signOut();
       } catch (error) {
-
-        console.log(
-          "Logout error:",
-          error
-        );
-
+        console.log(error);
       }
 
+      loginBox.style.display =
+        "block";
 
-      document.getElementById(
-        "loginBox"
-      ).style.display = "block";
+      aiBox.style.display =
+        "none";
 
+      passwordInput.value = "";
 
-      document.getElementById(
-        "aiBox"
-      ).style.display = "none";
+      questionInput.value = "";
 
-
-      document.getElementById(
-        "password"
-      ).value = "";
-
+      answer.innerText = "";
     }
 
 
-    /*
-    =========================================
-    CHECK EXISTING SESSION
-    =========================================
-    */
+    /* =========================
+       CHECK SESSION
+       ========================= */
 
     async function checkUser() {
 
       try {
 
-        const {
-          data,
-          error
-        } =
-          await arjunSupabase.auth
-            .getSession();
+        const { data } =
+          await client.auth.getSession();
 
-
-        if (error) {
-
-          console.log(
-            "Session error:",
-            error
-          );
-
-          return;
-        }
-
-
-        if (
-          data &&
-          data.session
-        ) {
-
+        if (data && data.session) {
           showAI();
-
         }
 
       } catch (error) {
@@ -569,28 +405,17 @@
         );
 
       }
-
     }
 
 
-    /*
-    =========================================
-    ASK AI
-    =========================================
-    */
+    /* =========================
+       ASK AI
+       ========================= */
 
     function askAI() {
 
       const question =
-        document.getElementById(
-          "question"
-        ).value.trim();
-
-
-      const answer =
-        document.getElementById(
-          "answer"
-        );
+        questionInput.value.trim();
 
 
       if (!question) {
@@ -605,21 +430,52 @@
       answer.innerText =
         "Hello Arjun! 🤖 I received your question: " +
         question;
-
     }
 
 
-    /*
-    =========================================
-    START
-    =========================================
-    */
+    /* =========================
+       BUTTONS
+       ========================= */
+
+    document
+      .getElementById("signupBtn")
+      .addEventListener(
+        "click",
+        signUp
+      );
+
+
+    document
+      .getElementById("loginBtn")
+      .addEventListener(
+        "click",
+        login
+      );
+
+
+    document
+      .getElementById("logoutBtn")
+      .addEventListener(
+        "click",
+        logout
+      );
+
+
+    document
+      .getElementById("askBtn")
+      .addEventListener(
+        "click",
+        askAI
+      );
+
+
+    /* =========================
+       START
+       ========================= */
 
     checkUser();
 
   </script>
 
-
 </body>
-
 </html>
