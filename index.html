@@ -81,9 +81,17 @@
 
       <h2>Login / Sign Up</h2>
 
-      <input id="email" type="email" placeholder="Enter your email">
+      <input
+        id="email"
+        type="email"
+        placeholder="Enter your email"
+      >
 
-      <input id="password" type="password" placeholder="Enter password">
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter password"
+      >
 
       <br>
 
@@ -99,8 +107,11 @@
 
       <p>Welcome to Arjun AI! 🎉</p>
 
-      <input id="question" type="text"
-        placeholder="Ask Arjun AI something...">
+      <input
+        id="question"
+        type="text"
+        placeholder="Ask Arjun AI something..."
+      >
 
       <br>
 
@@ -118,21 +129,33 @@
 
   <script>
 
-    const SUPABASE_URL = "YOUR_SUPABASE_URL";pzvqybgfndwgvmznizvj
+    const SUPABASE_URL =
+      "https://pzvqybgfndwgvmznizvj.supabase.co";
 
-    const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
+    const SUPABASE_KEY =
+      "sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V";
 
     const supabaseClient =
-      supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
 
 
+    // SIGN UP
     async function signUp() {
 
       const email =
-        document.getElementById("email").value;
+        document.getElementById("email").value.trim();
 
       const password =
         document.getElementById("password").value;
+
+      if (!email || !password) {
+        document.getElementById("message").innerText =
+          "Please enter email and password.";
+        return;
+      }
 
       const { error } =
         await supabaseClient.auth.signUp({
@@ -141,22 +164,34 @@
         });
 
       if (error) {
+
         document.getElementById("message").innerText =
           error.message;
+
       } else {
+
         document.getElementById("message").innerText =
           "Account created! Check your email.";
       }
     }
 
 
+    // LOGIN
     async function login() {
 
       const email =
-        document.getElementById("email").value;
+        document.getElementById("email").value.trim();
 
       const password =
         document.getElementById("password").value;
+
+      if (!email || !password) {
+
+        document.getElementById("message").innerText =
+          "Please enter email and password.";
+
+        return;
+      }
 
       const { error } =
         await supabaseClient.auth.signInWithPassword({
@@ -165,30 +200,44 @@
         });
 
       if (error) {
+
         document.getElementById("message").innerText =
           error.message;
+
       } else {
+
+        document.getElementById("message").innerText = "";
+
         showAI();
       }
     }
 
 
+    // LOGOUT
     async function logout() {
 
       await supabaseClient.auth.signOut();
 
-      document.getElementById("loginBox").style.display = "block";
-      document.getElementById("aiBox").style.display = "none";
+      document.getElementById("loginBox").style.display =
+        "block";
+
+      document.getElementById("aiBox").style.display =
+        "none";
     }
 
 
+    // SHOW AI
     function showAI() {
 
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("aiBox").style.display = "block";
+      document.getElementById("loginBox").style.display =
+        "none";
+
+      document.getElementById("aiBox").style.display =
+        "block";
     }
 
 
+    // CHECK USER
     async function checkUser() {
 
       const { data } =
@@ -200,6 +249,7 @@
     }
 
 
+    // ASK AI
     function askAI() {
 
       const question =
@@ -222,6 +272,7 @@
     }
 
 
+    // CHECK LOGIN
     checkUser();
 
   </script>
