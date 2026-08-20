@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arjun AI</title>
+
+  <title>Arjun AI - My Personal AI Assistant</title>
 
   <style>
     body {
@@ -18,6 +19,14 @@
       max-width: 500px;
       margin: 50px auto;
       padding: 30px;
+    }
+
+    h1 {
+      font-size: 32px;
+    }
+
+    p {
+      color: #cbd5e1;
     }
 
     input {
@@ -41,6 +50,10 @@
       cursor: pointer;
     }
 
+    button:hover {
+      background: #1d4ed8;
+    }
+
     #aiBox {
       display: none;
     }
@@ -62,42 +75,64 @@
   <div class="box">
 
     <h1>🤖 Arjun AI</h1>
+
     <p>My Personal AI Assistant</p>
+
+
+    <!-- LOGIN BOX -->
 
     <div id="loginBox">
 
       <h2>Login / Sign Up</h2>
 
-      <input id="email"
-             type="email"
-             placeholder="Enter your email">
+      <input
+        id="email"
+        type="email"
+        placeholder="Enter your email"
+      >
 
-      <input id="password"
-             type="password"
-             placeholder="Enter password">
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter password"
+      >
 
       <br>
 
-      <button onclick="signUp()">Sign Up</button>
-      <button onclick="login()">Login</button>
+      <button onclick="signUp()">
+        Sign Up
+      </button>
+
+      <button onclick="login()">
+        Login
+      </button>
 
       <div id="message"></div>
 
     </div>
 
 
+    <!-- AI BOX -->
+
     <div id="aiBox">
 
       <h2>Welcome to Arjun AI! 🎉</h2>
 
-      <input id="question"
-             type="text"
-             placeholder="Ask Arjun AI something...">
+      <input
+        id="question"
+        type="text"
+        placeholder="Ask Arjun AI something..."
+      >
 
       <br>
 
-      <button onclick="askAI()">Ask Arjun AI</button>
-      <button onclick="logout()">Logout</button>
+      <button onclick="askAI()">
+        Ask Arjun AI
+      </button>
+
+      <button onclick="logout()">
+        Logout
+      </button>
 
       <div id="answer"></div>
 
@@ -106,174 +141,332 @@
   </div>
 
 
+  <!-- SUPABASE LIBRARY -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
   <script>
+
+    // ==============================
+    // SUPABASE SETTINGS
+    // ==============================
 
     const SUPABASE_URL =
       "https://pzvqybgfndwgvmznizvj.supabase.co";
 
-    /*
-      इथे Supabase मधून नवीन Publishable Key paste कर.
-    */
-    const SUPABASE_KEY =
-      "PASTE_NEW_PUBLISHABLE_KEY_HERE";
-sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
 
-    const supabaseClient =
+    const SUPABASE_KEY =
+      "PASTE_YOUR_NEW_PUBLISHABLE_KEY_HERE";sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
+
+
+
+    // ==============================
+    // CREATE SUPABASE CLIENT
+    // ==============================
+
+    window.arjunSupabase =
       window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
       );
 
 
-    function message(text) {
-      document.getElementById("message").innerText = text;
+    // ==============================
+    // MESSAGE
+    // ==============================
+
+    function showMessage(text) {
+
+      document.getElementById("message").innerText =
+        text;
+
     }
 
+
+    // ==============================
+    // SIGN UP
+    // ==============================
 
     async function signUp() {
 
       const email =
-        document.getElementById("email").value.trim();
+        document.getElementById("email")
+          .value
+          .trim();
 
       const password =
-        document.getElementById("password").value;
+        document.getElementById("password")
+          .value;
+
 
       if (!email || !password) {
-        message("Please enter email and password.");
+
+        showMessage(
+          "Please enter email and password."
+        );
+
         return;
       }
 
-      message("Creating account...");
+
+      if (password.length < 6) {
+
+        showMessage(
+          "Password must be at least 6 characters."
+        );
+
+        return;
+      }
+
+
+      showMessage(
+        "Creating account..."
+      );
+
 
       try {
 
         const { error } =
-          await supabaseClient.auth.signUp({
+          await window.arjunSupabase.auth.signUp({
+
             email: email,
+
             password: password
+
           });
 
+
         if (error) {
-          message("Sign Up Error: " + error.message);
+
+          showMessage(
+            "Sign Up Error: " +
+            error.message
+          );
+
           return;
         }
 
-        message("Account created successfully!");
+
+        showMessage(
+          "Account created successfully!"
+        );
+
 
       } catch (error) {
 
-        message("Error: " + error.message);
+        showMessage(
+          "Connection Error: " +
+          error.message
+        );
+
       }
+
     }
 
+
+    // ==============================
+    // LOGIN
+    // ==============================
 
     async function login() {
 
       const email =
-        document.getElementById("email").value.trim();
+        document.getElementById("email")
+          .value
+          .trim();
 
       const password =
-        document.getElementById("password").value;
+        document.getElementById("password")
+          .value;
+
 
       if (!email || !password) {
-        message("Please enter email and password.");
+
+        showMessage(
+          "Please enter email and password."
+        );
+
         return;
       }
 
-      message("Logging in...");
+
+      showMessage(
+        "Logging in..."
+      );
+
 
       try {
 
-        const { data, error } =
-          await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+        const result =
+          await window.arjunSupabase.auth
+            .signInWithPassword({
+
+              email: email,
+
+              password: password
+
+            });
+
+
+        const data =
+          result.data;
+
+        const error =
+          result.error;
+
 
         if (error) {
 
-          message("Login Error: " + error.message);
+          showMessage(
+            "Login Error: " +
+            error.message
+          );
+
           return;
         }
 
-        if (data.session) {
 
-          message("");
+        if (data && data.session) {
+
+          showMessage("");
 
           showAI();
 
         } else {
 
-          message("Login failed. No session found.");
+          showMessage(
+            "Login failed. No session found."
+          );
+
         }
+
 
       } catch (error) {
 
-        message("Connection Error: " + error.message);
+        showMessage(
+          "Connection Error: " +
+          error.message
+        );
+
       }
+
     }
 
+
+    // ==============================
+    // SHOW AI
+    // ==============================
 
     function showAI() {
 
-      document.getElementById("loginBox").style.display =
-        "none";
+      document.getElementById("loginBox")
+        .style.display = "none";
 
-      document.getElementById("aiBox").style.display =
-        "block";
+      document.getElementById("aiBox")
+        .style.display = "block";
+
     }
 
+
+    // ==============================
+    // LOGOUT
+    // ==============================
 
     async function logout() {
 
-      await supabaseClient.auth.signOut();
+      try {
 
-      document.getElementById("loginBox").style.display =
-        "block";
+        await window.arjunSupabase.auth.signOut();
 
-      document.getElementById("aiBox").style.display =
-        "none";
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+
+      document.getElementById("loginBox")
+        .style.display = "block";
+
+      document.getElementById("aiBox")
+        .style.display = "none";
+
+      document.getElementById("email")
+        .value = "";
+
+      document.getElementById("password")
+        .value = "";
+
     }
 
+
+    // ==============================
+    // CHECK EXISTING LOGIN
+    // ==============================
 
     async function checkUser() {
 
       try {
 
         const { data } =
-          await supabaseClient.auth.getSession();
+          await window.arjunSupabase.auth
+            .getSession();
 
-        if (data.session) {
+
+        if (data && data.session) {
+
           showAI();
+
         }
 
       } catch (error) {
 
-        message("Session Error: " + error.message);
+        showMessage(
+          "Session Error: " +
+          error.message
+        );
+
       }
+
     }
 
+
+    // ==============================
+    // ASK AI
+    // ==============================
 
     function askAI() {
 
       const question =
-        document.getElementById("question").value.trim();
+        document.getElementById("question")
+          .value
+          .trim();
+
+
+      const answer =
+        document.getElementById("answer");
+
 
       if (!question) {
 
-        document.getElementById("answer").innerText =
+        answer.innerText =
           "Please ask me something.";
 
         return;
       }
 
-      document.getElementById("answer").innerText =
-        "Hello Arjun! I received your question: " +
+
+      answer.innerText =
+        "Hello Arjun! 🤖 I received your question: " +
         question;
+
     }
 
+
+    // ==============================
+    // START
+    // ==============================
 
     checkUser();
 
