@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Arjun AI - My Personal AI Assistant</title>
 
+
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
@@ -16,13 +29,15 @@
     }
 
     .box {
+      width: 100%;
       max-width: 500px;
-      margin: 50px auto;
-      padding: 30px;
+      margin: 0 auto;
+      padding: 50px 20px;
     }
 
     h1 {
       font-size: 32px;
+      margin-bottom: 5px;
     }
 
     p {
@@ -30,18 +45,18 @@
     }
 
     input {
-      width: 90%;
+      width: 100%;
       padding: 14px;
-      border-radius: 10px;
-      border: none;
       margin-top: 12px;
+      border: none;
+      border-radius: 10px;
       font-size: 16px;
-      box-sizing: border-box;
+      outline: none;
     }
 
     button {
-      margin-top: 15px;
-      padding: 13px 25px;
+      margin: 15px 5px 0;
+      padding: 13px 24px;
       border: none;
       border-radius: 10px;
       background: #2563eb;
@@ -54,69 +69,94 @@
       background: #1d4ed8;
     }
 
-    #aiBox {
-      display: none;
+    #message {
+      margin-top: 18px;
+      color: #fbbf24;
+      min-height: 24px;
     }
 
-    #message {
-      margin-top: 15px;
-      color: #fbbf24;
+    #aiBox {
+      display: none;
     }
 
     #answer {
       margin-top: 25px;
       color: #93c5fd;
+      line-height: 1.5;
     }
+
   </style>
+
 </head>
 
+
 <body>
+
 
   <div class="box">
 
     <h1>🤖 Arjun AI</h1>
 
-    <p>My Personal AI Assistant</p>
+    <p>
+      My Personal AI Assistant
+    </p>
 
 
-    <!-- LOGIN BOX -->
+    <!-- LOGIN -->
 
     <div id="loginBox">
 
       <h2>Login / Sign Up</h2>
 
+
       <input
         id="email"
         type="email"
         placeholder="Enter your email"
+        autocomplete="email"
       >
+
 
       <input
         id="password"
         type="password"
         placeholder="Enter password"
+        autocomplete="current-password"
       >
+
 
       <br>
 
-      <button onclick="signUp()">
+
+      <button
+        type="button"
+        onclick="signUp()"
+      >
         Sign Up
       </button>
 
-      <button onclick="login()">
+
+      <button
+        type="button"
+        onclick="login()"
+      >
         Login
       </button>
+
 
       <div id="message"></div>
 
     </div>
 
 
-    <!-- AI BOX -->
+    <!-- AI -->
 
     <div id="aiBox">
 
-      <h2>Welcome to Arjun AI! 🎉</h2>
+      <h2>
+        Welcome to Arjun AI! 🎉
+      </h2>
+
 
       <input
         id="question"
@@ -124,15 +164,25 @@
         placeholder="Ask Arjun AI something..."
       >
 
+
       <br>
 
-      <button onclick="askAI()">
+
+      <button
+        type="button"
+        onclick="askAI()"
+      >
         Ask Arjun AI
       </button>
 
-      <button onclick="logout()">
+
+      <button
+        type="button"
+        onclick="logout()"
+      >
         Logout
       </button>
+
 
       <div id="answer"></div>
 
@@ -141,69 +191,91 @@
   </div>
 
 
-  <!-- SUPABASE LIBRARY -->
+  <!-- SUPABASE -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
 
   <script>
 
-    // ==============================
-    // SUPABASE SETTINGS
-    // ==============================
+    /*
+    =========================================
+    SUPABASE CONFIGURATION
+    =========================================
+    */
 
     const SUPABASE_URL =
       "https://pzvqybgfndwgvmznizvj.supabase.co";
 
 
     const SUPABASE_KEY =
-      "PASTE_YOUR_NEW_PUBLISHABLE_KEY_HERE";sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
+    ;sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V
 
 
+    /*
+    =========================================
+    CREATE SUPABASE CLIENT
+    =========================================
+    */
 
-    // ==============================
-    // CREATE SUPABASE CLIENT
-    // ==============================
-
-    window.arjunSupabase =
+    const arjunSupabase =
       window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
       );
 
 
-    // ==============================
-    // MESSAGE
-    // ==============================
+    /*
+    =========================================
+    MESSAGE
+    =========================================
+    */
 
     function showMessage(text) {
 
-      document.getElementById("message").innerText =
-        text;
+      document.getElementById(
+        "message"
+      ).innerText = text;
 
     }
 
 
-    // ==============================
-    // SIGN UP
-    // ==============================
+    /*
+    =========================================
+    SIGN UP
+    =========================================
+    */
 
     async function signUp() {
 
       const email =
-        document.getElementById("email")
-          .value
-          .trim();
+        document.getElementById(
+          "email"
+        ).value.trim();
+
 
       const password =
-        document.getElementById("password")
-          .value;
+        document.getElementById(
+          "password"
+        ).value;
 
 
-      if (!email || !password) {
+      if (!email) {
 
         showMessage(
-          "Please enter email and password."
+          "Please enter your email."
+        );
+
+        return;
+      }
+
+
+      if (!password) {
+
+        showMessage(
+          "Please enter your password."
         );
 
         return;
@@ -227,8 +299,11 @@
 
       try {
 
-        const { error } =
-          await window.arjunSupabase.auth.signUp({
+        const {
+          data,
+          error
+        } =
+          await arjunSupabase.auth.signUp({
 
             email: email,
 
@@ -242,6 +317,25 @@
           showMessage(
             "Sign Up Error: " +
             error.message
+          );
+
+          return;
+        }
+
+
+        /*
+        If email confirmation is enabled,
+        Supabase will send confirmation email.
+        */
+
+        if (
+          data &&
+          data.user &&
+          !data.session
+        ) {
+
+          showMessage(
+            "Account created! Please confirm your email."
           );
 
           return;
@@ -265,26 +359,40 @@
     }
 
 
-    // ==============================
-    // LOGIN
-    // ==============================
+    /*
+    =========================================
+    LOGIN
+    =========================================
+    */
 
     async function login() {
 
       const email =
-        document.getElementById("email")
-          .value
-          .trim();
+        document.getElementById(
+          "email"
+        ).value.trim();
+
 
       const password =
-        document.getElementById("password")
-          .value;
+        document.getElementById(
+          "password"
+        ).value;
 
 
-      if (!email || !password) {
+      if (!email) {
 
         showMessage(
-          "Please enter email and password."
+          "Please enter your email."
+        );
+
+        return;
+      }
+
+
+      if (!password) {
+
+        showMessage(
+          "Please enter your password."
         );
 
         return;
@@ -298,8 +406,11 @@
 
       try {
 
-        const result =
-          await window.arjunSupabase.auth
+        const {
+          data,
+          error
+        } =
+          await arjunSupabase.auth
             .signInWithPassword({
 
               email: email,
@@ -307,13 +418,6 @@
               password: password
 
             });
-
-
-        const data =
-          result.data;
-
-        const error =
-          result.error;
 
 
         if (error) {
@@ -327,7 +431,10 @@
         }
 
 
-        if (data && data.session) {
+        if (
+          data &&
+          data.session
+        ) {
 
           showMessage("");
 
@@ -354,67 +461,98 @@
     }
 
 
-    // ==============================
-    // SHOW AI
-    // ==============================
+    /*
+    =========================================
+    SHOW AI
+    =========================================
+    */
 
     function showAI() {
 
-      document.getElementById("loginBox")
-        .style.display = "none";
+      document.getElementById(
+        "loginBox"
+      ).style.display = "none";
 
-      document.getElementById("aiBox")
-        .style.display = "block";
+
+      document.getElementById(
+        "aiBox"
+      ).style.display = "block";
 
     }
 
 
-    // ==============================
-    // LOGOUT
-    // ==============================
+    /*
+    =========================================
+    LOGOUT
+    =========================================
+    */
 
     async function logout() {
 
       try {
 
-        await window.arjunSupabase.auth.signOut();
+        await arjunSupabase.auth.signOut();
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "Logout error:",
+          error
+        );
 
       }
 
 
-      document.getElementById("loginBox")
-        .style.display = "block";
+      document.getElementById(
+        "loginBox"
+      ).style.display = "block";
 
-      document.getElementById("aiBox")
-        .style.display = "none";
 
-      document.getElementById("email")
-        .value = "";
+      document.getElementById(
+        "aiBox"
+      ).style.display = "none";
 
-      document.getElementById("password")
-        .value = "";
+
+      document.getElementById(
+        "password"
+      ).value = "";
 
     }
 
 
-    // ==============================
-    // CHECK EXISTING LOGIN
-    // ==============================
+    /*
+    =========================================
+    CHECK EXISTING SESSION
+    =========================================
+    */
 
     async function checkUser() {
 
       try {
 
-        const { data } =
-          await window.arjunSupabase.auth
+        const {
+          data,
+          error
+        } =
+          await arjunSupabase.auth
             .getSession();
 
 
-        if (data && data.session) {
+        if (error) {
+
+          console.log(
+            "Session error:",
+            error
+          );
+
+          return;
+        }
+
+
+        if (
+          data &&
+          data.session
+        ) {
 
           showAI();
 
@@ -422,9 +560,9 @@
 
       } catch (error) {
 
-        showMessage(
-          "Session Error: " +
-          error.message
+        console.log(
+          "Session error:",
+          error
         );
 
       }
@@ -432,20 +570,24 @@
     }
 
 
-    // ==============================
-    // ASK AI
-    // ==============================
+    /*
+    =========================================
+    ASK AI
+    =========================================
+    */
 
     function askAI() {
 
       const question =
-        document.getElementById("question")
-          .value
-          .trim();
+        document.getElementById(
+          "question"
+        ).value.trim();
 
 
       const answer =
-        document.getElementById("answer");
+        document.getElementById(
+          "answer"
+        );
 
 
       if (!question) {
@@ -464,13 +606,17 @@
     }
 
 
-    // ==============================
-    // START
-    // ==============================
+    /*
+    =========================================
+    START
+    =========================================
+    */
 
     checkUser();
 
   </script>
 
+
 </body>
+
 </html>
