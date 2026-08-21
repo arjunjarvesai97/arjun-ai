@@ -55,6 +55,11 @@
       opacity: 0.9;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     #message {
       margin-top: 18px;
       color: #fbbf24;
@@ -159,6 +164,9 @@
     const SUPABASE_KEY =
       "sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V";
 
+    const EDGE_FUNCTION_URL =
+      "https://pzvqybgfndwgvmznizvj.supabase.co/functions/v1/clever-task";
+
 
     const client =
       window.supabase.createClient(
@@ -220,11 +228,8 @@
 
     function showAI() {
 
-      loginBox.style.display =
-        "none";
-
-      aiBox.style.display =
-        "block";
+      loginBox.style.display = "none";
+      aiBox.style.display = "block";
     }
 
 
@@ -283,7 +288,6 @@
         if (data.session) {
 
           showMessage("");
-
           showAI();
 
         } else {
@@ -291,7 +295,6 @@
           showMessage(
             "Account created. Please confirm your email."
           );
-
         }
 
       } catch (error) {
@@ -300,7 +303,6 @@
           "Error: " +
           error.message
         );
-
       }
     }
 
@@ -351,7 +353,6 @@
         if (data && data.session) {
 
           showMessage("");
-
           showAI();
 
         } else {
@@ -359,7 +360,6 @@
           showMessage(
             "Login failed."
           );
-
         }
 
       } catch (error) {
@@ -368,7 +368,6 @@
           "Connection Error: " +
           error.message
         );
-
       }
     }
 
@@ -397,12 +396,26 @@
 
       try {
 
-        /* Check login session */
+        /* Get logged-in user session */
 
-        const { data: sessionData } =
-          await client.auth.getSession();
+        const {
+          data: sessionData,
+          error: sessionError
+        } = await client.auth.getSession();
 
-        if (!sessionData.session) {
+        if (sessionError) {
+
+          answer.innerText =
+            "Session Error: " +
+            sessionError.message;
+
+          return;
+        }
+
+        const session =
+          sessionData.session;
+
+        if (!session) {
 
           answer.innerText =
             "Please login first.";
@@ -413,31 +426,71 @@
 
         /* Call Supabase Edge Function */
 
-        const { data, error } =
-          await client.functions.invoke(
-            "clever-task",
+        const response =
+          await fetch(
+            EDGE_FUNCTION_URL,
             {
-              body: {
-                name: "Arjun",
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  "Bearer " +
+                  session.access_token
+              },
+
+              body: JSON.stringify({
                 question: question
-              }
+              })
             }
           );
 
 
-        /* Function error */
+        /* Read response */
 
-        if (error) {
+        const text =
+          await response.text();
+
+        let data;
+
+        try {
+
+          data =
+            JSON.parse(text);
+
+        } catch {
+
+          data = {
+            error: text ||
+              "Invalid response from server."
+          };
+        }
+
+
+        /* HTTP error */
+
+        if (!response.ok) {
 
           answer.innerText =
-            "Function Error: " +
-            error.message;
+            "Function Error (" +
+            response.status +
+            "): " +
+            (
+              data.error ||
+              data.message ||
+              "Request failed."
+            );
 
           return;
         }
 
 
-        /* AI answer */
+        /* Successful AI answer */
 
         if (data && data.answer) {
 
@@ -453,8 +506,7 @@
         } else {
 
           answer.innerText =
-            "No answer received.";
-
+            "No answer received from Arjun AI.";
         }
 
       } catch (error) {
@@ -466,7 +518,6 @@
       } finally {
 
         askBtn.disabled = false;
-
       }
     }
 
@@ -484,7 +535,6 @@
       } catch (error) {
 
         console.log(error);
-
       }
 
       loginBox.style.display =
@@ -494,9 +544,7 @@
         "none";
 
       passwordInput.value = "";
-
       questionInput.value = "";
-
       answer.innerText = "";
 
       showMessage("");
@@ -520,7 +568,6 @@
         ) {
 
           showAI();
-
         }
 
       } catch (error) {
@@ -529,7 +576,6 @@
           "Session error:",
           error
         );
-
       }
     }
 
@@ -570,9 +616,7 @@
           event.preventDefault();
 
           askAI();
-
         }
-
       }
     );
 
