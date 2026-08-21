@@ -51,6 +51,10 @@
       cursor: pointer;
     }
 
+    button:hover {
+      opacity: 0.9;
+    }
+
     #message {
       margin-top: 18px;
       color: #fbbf24;
@@ -64,6 +68,8 @@
     #answer {
       margin-top: 25px;
       color: #93c5fd;
+      white-space: pre-wrap;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -74,6 +80,8 @@
 
     <h1>🤖 Arjun AI</h1>
     <p>My Personal AI Assistant</p>
+
+    <!-- LOGIN -->
 
     <div id="loginBox">
 
@@ -105,6 +113,9 @@
 
     </div>
 
+
+    <!-- AI -->
+
     <div id="aiBox">
 
       <h2>Welcome to Arjun AI! 🎉</h2>
@@ -132,11 +143,15 @@
   </div>
 
 
+  <!-- SUPABASE -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
 
-    /* SUPABASE CONFIG */
+    /* =========================
+       SUPABASE CONFIG
+    ========================= */
 
     const SUPABASE_URL =
       "https://pzvqybgfndwgvmznizvj.supabase.co";
@@ -145,8 +160,6 @@
       "sb_publishable_jaTF9qoveQieLoVNpBm_tg_BdLgm22V";
 
 
-    /* CREATE SUPABASE CLIENT */
-
     const client =
       window.supabase.createClient(
         SUPABASE_URL,
@@ -154,7 +167,9 @@
       );
 
 
-    /* ELEMENTS */
+    /* =========================
+       ELEMENTS
+    ========================= */
 
     const emailInput =
       document.getElementById("email");
@@ -177,15 +192,45 @@
     const answer =
       document.getElementById("answer");
 
+    const signupBtn =
+      document.getElementById("signupBtn");
 
-    /* MESSAGE */
+    const loginBtn =
+      document.getElementById("loginBtn");
+
+    const askBtn =
+      document.getElementById("askBtn");
+
+    const logoutBtn =
+      document.getElementById("logoutBtn");
+
+
+    /* =========================
+       MESSAGE
+    ========================= */
 
     function showMessage(text) {
       message.innerText = text;
     }
 
 
-    /* SIGN UP */
+    /* =========================
+       SHOW AI
+    ========================= */
+
+    function showAI() {
+
+      loginBox.style.display =
+        "none";
+
+      aiBox.style.display =
+        "block";
+    }
+
+
+    /* =========================
+       SIGN UP
+    ========================= */
 
     async function signUp() {
 
@@ -196,20 +241,26 @@
         passwordInput.value;
 
       if (!email || !password) {
+
         showMessage(
           "Please enter email and password."
         );
+
         return;
       }
 
       if (password.length < 6) {
+
         showMessage(
           "Password must be at least 6 characters."
         );
+
         return;
       }
 
-      showMessage("Creating account...");
+      showMessage(
+        "Creating account..."
+      );
 
       try {
 
@@ -220,14 +271,18 @@
           });
 
         if (error) {
+
           showMessage(
             "Sign Up Error: " +
             error.message
           );
+
           return;
         }
 
         if (data.session) {
+
+          showMessage("");
 
           showAI();
 
@@ -250,7 +305,9 @@
     }
 
 
-    /* LOGIN */
+    /* =========================
+       LOGIN
+    ========================= */
 
     async function login() {
 
@@ -261,13 +318,17 @@
         passwordInput.value;
 
       if (!email || !password) {
+
         showMessage(
           "Please enter email and password."
         );
+
         return;
       }
 
-      showMessage("Logging in...");
+      showMessage(
+        "Logging in..."
+      );
 
       try {
 
@@ -312,19 +373,107 @@
     }
 
 
-    /* SHOW AI */
+    /* =========================
+       ASK ARJUN AI
+    ========================= */
 
-    function showAI() {
+    async function askAI() {
 
-      loginBox.style.display =
-        "none";
+      const question =
+        questionInput.value.trim();
 
-      aiBox.style.display =
-        "block";
+      if (!question) {
+
+        answer.innerText =
+          "Please ask me something.";
+
+        return;
+      }
+
+      answer.innerText =
+        "Thinking... 🤖";
+
+      askBtn.disabled = true;
+
+      try {
+
+        /* Check login session */
+
+        const { data: sessionData } =
+          await client.auth.getSession();
+
+        if (!sessionData.session) {
+
+          answer.innerText =
+            "Please login first.";
+
+          return;
+        }
+
+
+        /* Call Supabase Edge Function */
+
+        const { data, error } =
+          await client.functions.invoke(
+            "clever-task",
+            {
+              body: {
+                name: "Arjun",
+                question: question
+              }
+            }
+          );
+
+
+        /* Function error */
+
+        if (error) {
+
+          answer.innerText =
+            "Function Error: " +
+            error.message;
+
+          return;
+        }
+
+
+        /* AI answer */
+
+        if (data && data.answer) {
+
+          answer.innerText =
+            data.answer;
+
+        } else if (data && data.error) {
+
+          answer.innerText =
+            "AI Error: " +
+            data.error;
+
+        } else {
+
+          answer.innerText =
+            "No answer received.";
+
+        }
+
+      } catch (error) {
+
+        answer.innerText =
+          "Connection Error: " +
+          error.message;
+
+      } finally {
+
+        askBtn.disabled = false;
+
+      }
     }
 
 
-    /* LOGOUT */
+    /* =========================
+       LOGOUT
+    ========================= */
 
     async function logout() {
 
@@ -349,10 +498,14 @@
       questionInput.value = "";
 
       answer.innerText = "";
+
+      showMessage("");
     }
 
 
-    /* CHECK SESSION */
+    /* =========================
+       CHECK SESSION
+    ========================= */
 
     async function checkUser() {
 
@@ -361,8 +514,13 @@
         const { data } =
           await client.auth.getSession();
 
-        if (data && data.session) {
+        if (
+          data &&
+          data.session
+        ) {
+
           showAI();
+
         }
 
       } catch (error) {
@@ -376,56 +534,47 @@
     }
 
 
-    /* ASK AI */
+    /* =========================
+       BUTTON EVENTS
+    ========================= */
 
-    function askAI() {
+    signupBtn.addEventListener(
+      "click",
+      signUp
+    );
 
-      const question =
-        questionInput.value.trim();
+    loginBtn.addEventListener(
+      "click",
+      login
+    );
 
-      if (!question) {
+    askBtn.addEventListener(
+      "click",
+      askAI
+    );
 
-        answer.innerText =
-          "Please ask me something.";
+    logoutBtn.addEventListener(
+      "click",
+      logout
+    );
 
-        return;
+
+    /* Enter key = Ask AI */
+
+    questionInput.addEventListener(
+      "keydown",
+      function (event) {
+
+        if (event.key === "Enter") {
+
+          event.preventDefault();
+
+          askAI();
+
+        }
+
       }
-
-      answer.innerText =
-        "Hello Arjun! 🤖 I received your question: " +
-        question;
-    }
-
-
-    /* BUTTONS */
-
-    document
-      .getElementById("signupBtn")
-      .addEventListener(
-        "click",
-        signUp
-      );
-
-    document
-      .getElementById("loginBtn")
-      .addEventListener(
-        "click",
-        login
-      );
-
-    document
-      .getElementById("logoutBtn")
-      .addEventListener(
-        "click",
-        logout
-      );
-
-    document
-      .getElementById("askBtn")
-      .addEventListener(
-        "click",
-        askAI
-      );
+    );
 
 
     /* START */
@@ -435,4 +584,5 @@
   </script>
 
 </body>
+
 </html>
